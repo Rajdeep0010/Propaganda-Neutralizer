@@ -2,14 +2,12 @@
 import streamlit as st
 from pipeline import run_pipeline
 
-# ── PAGE CONFIG ─────────────────────────────────────────────────
 st.set_page_config(
     page_title="Propaganda Neutralizer",
     page_icon="🔍",
     layout="wide"
 )
 
-# ── CUSTOM CSS ───────────────────────────────────────────────────
 st.markdown("""
 <style>
     .main { padding: 2rem; }
@@ -23,12 +21,29 @@ st.markdown("""
     }
     .score-label { font-size: 0.8rem; color: #aaa; margin-bottom: 2px; }
     .score-value { font-size: 1.6rem; font-weight: 700; color: #4ade80; }
+    .help-box {
+        background: #1e1e2e;
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 0.8rem 1rem;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+        color: #ccc;
+    }
 </style>
 """, unsafe_allow_html=True)
 
+# ── SESSION STATE — fixes vanishing text on button click ─────────
+# Streamlit reruns the whole script on every interaction.
+# Without session_state, example values reset to "" on rerun.
+# We store context and snippet in session_state so they persist.
+if "context" not in st.session_state:
+    st.session_state.context = ""
+if "snippet" not in st.session_state:
+    st.session_state.snippet = ""
+
 # ── SIDEBAR ──────────────────────────────────────────────────────
 with st.sidebar:
-    st.image("https://img.icons8.com/fluency/96/propaganda.png", width=60)
     st.title("About")
     st.markdown("""
     This tool detects **propaganda techniques** in text and rewrites them into neutral, factual language.
@@ -40,24 +55,17 @@ with st.sidebar:
 
     **Or pick an example below ↓**
     """)
-
     st.divider()
     st.markdown("**Detects 19 techniques including:**")
-    techniques_list = [
-        "🔴 Loaded Language",
-        "🔴 Name Calling",
-        "🔴 Appeal to Fear",
-        "🔴 Exaggeration",
-        "🔴 Bandwagon",
-        "🔴 Black & White Fallacy",
-        "🔴 Flag Waving",
-        "🔴 Doubt",
-        "... and 11 more"
-    ]
-    for t in techniques_list:
+    for t in [
+        "🔴 Loaded Language", "🔴 Name Calling",
+        "🔴 Appeal to Fear",  "🔴 Exaggeration",
+        "🔴 Bandwagon",       "🔴 Black & White Fallacy",
+        "🔴 Flag Waving",     "🔴 Doubt", "... and 11 more"
+    ]:
         st.markdown(f"- {t}")
 
-# ── EXAMPLES ────────────────────────────────────────────────────
+# ── EXAMPLES ─────────────────────────────────────────────────────
 EXAMPLES = {
     "Loaded Language": {
         "context": "The radical left is destroying everything our ancestors built.",
@@ -89,31 +97,60 @@ st.divider()
 # ── EXAMPLE BUTTONS ──────────────────────────────────────────────
 st.markdown("**Quick Examples:**")
 cols = st.columns(len(EXAMPLES))
-selected_example = None
-
 for i, (label, data) in enumerate(EXAMPLES.items()):
     if cols[i].button(label, use_container_width=True):
-        selected_example = data
+        # store in session_state so values survive the rerun
+        st.session_state.context = data["context"]
+        st.session_state.snippet = data["snippet"]
 
-# ── INPUT FIELDS ────────────────────────────────────────────────
-default_context = selected_example["context"] if selected_example else ""
-default_snippet = selected_example["snippet"] if selected_example else ""
+# ── FIELD EXPLANATIONS ───────────────────────────────────────────
+st.markdown("")
+col_help1, col_help2 = st.columns(2)
 
+with col_help1:
+    st.markdown("""
+    <div class="help-box">
+    📄 <b>What is Full Context?</b><br>
+    The complete sentence or paragraph containing the suspicious text.
+    This gives the model surrounding information to understand the meaning
+    and rewrite it accurately.
+    <br><br>
+    <i>Example: "The radical left is destroying everything our ancestors built."</i>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_help2:
+    st.markdown("""
+    <div class="help-box">
+    🎯 <b>What is Propaganda Span?</b><br>
+    The specific word or phrase inside the context that you think
+    contains propaganda. This is the exact fragment the model
+    will classify and the neutralizer will focus on removing.
+    <br><br>
+    <i>Example: "radical left is destroying everything"</i>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ── INPUT FIELDS ─────────────────────────────────────────────────
 col1, col2 = st.columns(2)
 with col1:
     context = st.text_area(
         "📄 Full Context",
-        value=default_context,
+        value=st.session_state.context,    # reads from session_state
         placeholder="Paste the full sentence or paragraph here...",
         height=130
     )
 with col2:
     snippet = st.text_area(
         "🎯 Propaganda Span",
-        value=default_snippet,
+        value=st.session_state.snippet,    # reads from session_state
         placeholder="Paste the specific suspicious phrase here...",
         height=130
     )
+
+# update session_state when user types manually
+st.session_state.context = context
+st.session_state.snippet = snippet
 
 st.markdown("")
 run_btn = st.button("🔍 Analyze & Neutralize", type="primary", use_container_width=True)
@@ -130,7 +167,6 @@ if run_btn:
 
         # ── DETECTED TECHNIQUES ──────────────────────────────────
         st.subheader("🎯 Detected Propaganda Techniques")
-
         if not result["techniques"]:
             st.success("✅ No propaganda technique detected — this text appears clean.")
         else:
@@ -141,8 +177,7 @@ if run_btn:
                 <div class="technique-card">
                     <b>{d['technique']}</b>
                     <span style="float:right; color:{color}; font-weight:700;">{confidence_pct}% confidence</span>
-                    <br>
-                    <small style="color:#aaa;">Detected in: <i>"{snippet}"</i></small>
+                    <br><small style="color:#aaa;">Detected in: <i>"{snippet}"</i></small>
                 </div>
                 """, unsafe_allow_html=True)
 
@@ -151,11 +186,9 @@ if run_btn:
         # ── BEFORE / AFTER ───────────────────────────────────────
         st.subheader("📝 Before / After Comparison")
         col3, col4 = st.columns(2)
-
         with col3:
             st.markdown("**🔴 Original (with propaganda)**")
             st.error(context)
-
         with col4:
             st.markdown("**🟢 Neutralized (rhetoric removed)**")
             st.success(result["neutralized"])
@@ -165,7 +198,7 @@ if run_btn:
         # ── EVALUATION SCORES ────────────────────────────────────
         if result.get("scores"):
             st.subheader("📊 Rewrite Quality Scores")
-            scores  = result["scores"]
+            scores = result["scores"]
             c1, c2, c3, c4 = st.columns(4)
 
             def score_color(s):
@@ -180,7 +213,7 @@ if run_btn:
                 val = scores.get(key, 0)
                 col.markdown(f"""
                 <div style="text-align:center; padding:1rem; background:#1e1e2e;
-                            border-radius:8px; border: 1px solid #333;">
+                            border-radius:8px; border:1px solid #333;">
                     <div class="score-label">{label}</div>
                     <div class="score-value" style="color:{score_color(val)};">{val}/5</div>
                 </div>

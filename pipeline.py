@@ -1,19 +1,19 @@
 #imports 
 from detector import detect
-from neutralizer import neutralizer
+from neutralizer import neutralize
 
 def run_pipeline(context, snippet):
     print("="*60)
     print((f"Original"))
     print(f"Context : {context}")
-    print(f"Snippet" : {snippet})
+    print(f"Snippet : {snippet}")
     print("="*60)
     
     #Detection
     detection = detect(context, snippet)
     
     if not detection:
-        print("\nNo propanda technique detected.")
+        print("\nNo propaganda technique detected.")
         print("="*60)
         return{
             "original" : context,
@@ -22,11 +22,11 @@ def run_pipeline(context, snippet):
             "neutralized": context
         }
     print(f"\n Detected techniques")
-    for d in detections:
+    for d in detection:
         print(f" {d['technique']:<40} confidence: {d['confidence']:.4f}")
         
     #Neutralize
-    top_technique = detections[0]["technique"]
+    top_technique = detection[0]["technique"]
     print(f"\nNeutralizing using top technique: {top_technique}")
     print("Rewriting...\n")
     neutralized = neutralize(context, snippet, top_technique)
@@ -41,7 +41,7 @@ def run_pipeline(context, snippet):
     return {
         "original"   : context,
         "snippet"    : snippet,
-        "techniques" : detections,
+        "techniques" : detection,
         "neutralized": neutralized
     }
     
@@ -59,5 +59,40 @@ if __name__ == "__main__":
 
     run_pipeline(
         context="The minister announced a new education policy for rural schools.",
-        snippet="new education policy for rural schools"
+        snippet="new education policy for rural schools"    
+    )
+    
+    run_pipeline(
+        context="These criminal immigrants are flooding our borders and stealing jobs from hardworking citizens.",
+        snippet="criminal immigrants are flooding our borders"
+    )
+
+    run_pipeline(
+        context="The globalist elite are secretly controlling our economy and pulling the strings of every government.",
+        snippet="globalist elite are secretly controlling our economy"
+    )
+
+    run_pipeline(
+        context="If you are not with us you are against us. There is no middle ground in this fight for our nation.",
+        snippet="If you are not with us you are against us"
+    )
+
+    run_pipeline(
+        context="This vaccine is nothing but a poison designed by billionaires to control the population.",
+        snippet="vaccine is nothing but a poison designed by billionaires"
+    )
+
+    run_pipeline(
+        context="The fake news media is the enemy of the people and cannot be trusted on anything.",
+        snippet="fake news media is the enemy of the people"
+    )
+
+    run_pipeline(
+        context="Real patriots don't question their leaders during times of war. Dissent is betrayal.",
+        snippet="Dissent is betrayal"
+    )
+
+    run_pipeline(
+        context="These protesters are nothing but thugs and terrorists trying to burn down our civilization.",
+        snippet="nothing but thugs and terrorists"
     )

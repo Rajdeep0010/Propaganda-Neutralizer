@@ -1,6 +1,7 @@
 #imports 
 from detector import detect
 from neutralizer import neutralize
+from evaluation import evaluate_pipeline
 
 def run_pipeline(context, snippet):
     print("="*60)
@@ -38,15 +39,16 @@ def run_pipeline(context, snippet):
     print(f"  {neutralized}")
     print("=" * 60)
 
-    return {
+    result = {
         "original"   : context,
         "snippet"    : snippet,
         "techniques" : detection,
-        "neutralized": neutralized
+        "neutralized": neutralized,
     }
-    
-    
-    
+    scores = evaluate_pipeline(result)
+    result["scores"] = scores
+
+    return result
 #Test
 if __name__ == "__main__":
 

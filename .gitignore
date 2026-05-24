@@ -1,0 +1,26 @@
+# Model weights — too large for git
+model/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+
+# Pickle files
+*.pkl
+
+# Jupyter
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# API keys — never commit
+.env
+*.env

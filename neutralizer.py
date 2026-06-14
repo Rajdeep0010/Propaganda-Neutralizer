@@ -1,15 +1,15 @@
-#imports
+# imports
 import os 
 from groq import Groq
 from dotenv import load_dotenv
 
-#load the api key
+# load the api key
 load_dotenv()
-client=Groq(api_key=os.getenv("GROQ_API_KEY"))
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 MODEL = "llama-3.1-8b-instant"
 
 
-#Technique
+# Technique
 TECHNIQUE_DEFINITIONS = {
     "Loaded_Language"               : "Uses emotionally charged words to influence instead of inform.",
     "Name_Calling"                  : "Attaches a negative label to a person or group to dismiss them.",
@@ -32,7 +32,8 @@ TECHNIQUE_DEFINITIONS = {
     "Whataboutism"                  : "Deflects criticism by pointing to someone else's faults.",
 }
 
-#Build prompt
+
+# Build prompt
 def build_prompt(context, snippet, technique):
     definition = TECHNIQUE_DEFINITIONS.get(technique, "A propaganda technique.")
 
@@ -58,7 +59,8 @@ Return ONLY the rewritten text. No explanation, no preamble.
 
 Neutralized version:"""
 
-#Neutralize
+
+# Neutralize
 def neutralize(context, snippet, technique):
     prompt = build_prompt(context, snippet, technique)
 
@@ -71,11 +73,11 @@ def neutralize(context, snippet, technique):
 
     return response.choices[0].message.content.strip()
 
-#Test
-# ── TEST ────────────────────────────────────────────────────────
+
+# Test
 if __name__ == "__main__":
-    context   = "The radical left is destroying everything our ancestors built."
-    snippet   = "radical left is destroying everything"
+    context = "The radical left is destroying everything our ancestors built."
+    snippet = "radical left is destroying everything"
     technique = "Loaded_Language"
 
     print(f"Technique  : {technique}")

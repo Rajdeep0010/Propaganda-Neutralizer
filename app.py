@@ -99,13 +99,13 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ── SESSION STATE ────────────────────────────────────────────────
+# Session state 
 if "context" not in st.session_state:
     st.session_state.context = ""
 if "snippet" not in st.session_state:
     st.session_state.snippet = ""
 
-# ── SIDEBAR ──────────────────────────────────────────────────────
+# Sidebar
 with st.sidebar:
     st.markdown("## Propaganda Neutralizer")
     st.markdown("""
@@ -130,7 +130,7 @@ with st.sidebar:
     ]:
         st.markdown(f"- {t}")
 
-# ── EXAMPLES ─────────────────────────────────────────────────────
+# Examples
 EXAMPLES = {
     "Loaded Language": {
         "context": "The radical left is destroying everything our ancestors built.",
@@ -154,12 +154,12 @@ EXAMPLES = {
     },
 }
 
-# ── HEADER ───────────────────────────────────────────────────────
+# header
 st.markdown("# Propaganda Neutralizer")
 st.markdown("Paste any text to detect hidden propaganda techniques and get a clean, neutral rewrite instantly.")
 st.divider()
 
-# ── EXAMPLE BUTTONS ──────────────────────────────────────────────
+# Example Buttons
 st.markdown("**Try a quick example:**")
 cols = st.columns(len(EXAMPLES))
 for i, (label, data) in enumerate(EXAMPLES.items()):
@@ -169,7 +169,7 @@ for i, (label, data) in enumerate(EXAMPLES.items()):
 
 st.markdown("")
 
-# ── FIELD EXPLANATIONS ───────────────────────────────────────────
+# Field explanation
 col_help1, col_help2 = st.columns(2)
 with col_help1:
     st.markdown("""
@@ -197,7 +197,7 @@ with col_help2:
     </div>
     """, unsafe_allow_html=True)
 
-# ── INPUT FIELDS ─────────────────────────────────────────────────
+# Input Fields
 col1, col2 = st.columns(2)
 with col1:
     context = st.text_area(
@@ -220,7 +220,7 @@ st.session_state.snippet = snippet
 st.markdown("")
 run_btn = st.button("Analyze and Neutralize", type="primary", use_container_width=True)
 
-# ── RUN PIPELINE ─────────────────────────────────────────────────
+# Run pipeline
 if run_btn:
     if not context.strip() or not snippet.strip():
         st.warning("Please fill in both fields before analyzing.")
@@ -230,7 +230,7 @@ if run_btn:
 
         st.divider()
 
-        # ── DETECTED TECHNIQUES ──────────────────────────────────
+        # Detect techniques
         st.markdown('<div class="section-title">Detected Propaganda Techniques</div>',
                     unsafe_allow_html=True)
 
@@ -265,8 +265,8 @@ if run_btn:
         else:
             for d in result["techniques"]:
                 confidence_pct = int(d["confidence"] * 100)
-                color          = "#e63946" if confidence_pct > 70 else "#f4a261"
-                meaning        = TECHNIQUE_MEANINGS.get(d["technique"], "")
+                color = "#e63946" if confidence_pct > 70 else "#f4a261"
+                meaning = TECHNIQUE_MEANINGS.get(d["technique"], "")
                 st.markdown(f"""
                 <div class="technique-card">
                     <div class="technique-name">
@@ -286,7 +286,7 @@ if run_btn:
 
         st.divider()
 
-        # ── BEFORE / AFTER ───────────────────────────────────────
+        # Before and after
         st.markdown('<div class="section-title">Before and After Comparison</div>',
                     unsafe_allow_html=True)
         col3, col4 = st.columns(2)
@@ -305,7 +305,7 @@ if run_btn:
 
         st.divider()
 
-        # ── EVALUATION SCORES ────────────────────────────────────
+        # Evaluation
         if result.get("scores"):
             st.markdown('<div class="section-title">Rewrite Quality Scores</div>',
                         unsafe_allow_html=True)
@@ -336,7 +336,7 @@ if run_btn:
                 return "#4ade80" if s >= 4 else "#f4a261" if s >= 3 else "#e63946"
 
             for col, key in zip([c1, c2, c3, c4], SCORE_DESCRIPTIONS):
-                val   = scores.get(key, 0)
+                val = scores.get(key, 0)
                 label, desc = SCORE_DESCRIPTIONS[key]
                 col.markdown(f"""
                 <div class="score-card">

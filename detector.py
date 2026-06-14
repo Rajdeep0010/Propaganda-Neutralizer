@@ -1,15 +1,15 @@
-#imports 
+# imports 
 import torch
 import pickle
 import numpy as np
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-#Configuration
+# Configuration
 MODEL_DIR = r"C:\Users\boser\Desktop\Propaganda_Neutrilizer\model"
-MAX_LEN=256
-device="cude" if torch.cuda.is_available() else "cpu"
+MAX_LEN = 256
+device = "cude" if torch.cuda.is_available() else "cpu"
 
-#Load the model
+# Load the model
 model = AutoModelForSequenceClassification.from_pretrained(
     MODEL_DIR,
     torch_dtype=torch.float32
@@ -27,9 +27,10 @@ with open(f"{MODEL_DIR}/thresholds.pkl", "rb") as f:
 
 print(f"Model loaded | Classes: {len(mlb.classes_)} | Device: {device}")
 
-#Detection
+
+# Detection
 def detect(context, snippet):
-    enc= tokenizer(
+    enc = tokenizer(
         context,
         snippet,
         max_length=MAX_LEN,
@@ -39,7 +40,7 @@ def detect(context, snippet):
     )
     
     with torch.no_grad():
-        logits=model(
+        logits = model(
             input_ids=enc["input_ids"].to(device),
             attention_mask=enc['attention_mask'].to(device)
         ).logits.float()
@@ -54,7 +55,8 @@ def detect(context, snippet):
 
     return results
 
-#Test
+
+# Test
 if __name__ == "__main__":
     context = "The radical left is destroying everything our ancestors built."
     snippet = "radical left is destroying everything"

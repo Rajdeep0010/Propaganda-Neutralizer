@@ -1,5 +1,3 @@
-```
-markdown
 # Propaganda Neutralizer
 
 An end-to-end NLP pipeline that detects propaganda techniques in text and rewrites them into neutral, factual language — with a before/after comparison and AI-powered quality scores.
@@ -169,4 +167,3 @@ Fixed threshold of 0.5 caused precision collapse on rare classes. Per-class opti
 
 **Why technique-aware prompting**
 Injecting the detected technique definition into the rewrite prompt forces the LLM to target the specific manipulation pattern rather than doing a generic paraphrase.
-```

@@ -1,4 +1,5 @@
-```markdown
+```
+markdown
 # Propaganda Neutralizer
 
 An end-to-end NLP pipeline that detects propaganda techniques in text and rewrites them into neutral, factual language — with a before/after comparison and AI-powered quality scores.
